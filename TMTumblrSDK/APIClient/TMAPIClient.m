@@ -171,14 +171,14 @@ NSString *fullBlogName(NSString *blogName);
             }
             
             [queue addOperationWithBlock:^{
-                blockCallback(response, error);
+                blockCallback(response, 1, error);
                 blockCallback = nil;
             }];
         };
         
         request.didFailBlock = ^(JXHTTPOperation *operation) {
             [queue addOperationWithBlock:^{
-                blockCallback(nil, operation.error);
+                blockCallback(nil, 0, operation.error);
                 blockCallback = nil;
             }];
         };
@@ -466,6 +466,13 @@ fileNameArray:(NSArray *)fileNameArrayOrNil parameters:(NSDictionary *)parameter
     if (callback) {
         __block typeof(callback) blockCallback = callback;
         
+        request.didSendDataBlock = ^(JXHTTPOperation *operation) {
+            
+            [queue addOperationWithBlock:^{
+                blockCallback(nil, operation.uploadProgress.floatValue, nil);
+            }];
+        };
+        
         request.didFinishLoadingBlock = ^(JXHTTPOperation *operation) {
             NSDictionary *response = operation.responseJSON;
             int statusCode = response[@"meta"] ? [response[@"meta"][@"status"] intValue] : 0;
@@ -476,14 +483,14 @@ fileNameArray:(NSArray *)fileNameArrayOrNil parameters:(NSDictionary *)parameter
                 error = [NSError errorWithDomain:@"Request failed" code:statusCode userInfo:nil];
             
             [queue addOperationWithBlock:^{
-                blockCallback(response[@"response"], error);
+                blockCallback(response[@"response"], operation.uploadProgress.floatValue, error);
                 blockCallback = nil;
             }];
         };
         
         request.didFailBlock = ^(JXHTTPOperation *operation) {
             [queue addOperationWithBlock:^{
-                blockCallback(nil, operation.error);
+                blockCallback(nil, operation.uploadProgress.floatValue, operation.error);
                 blockCallback = nil;
             }];
         };

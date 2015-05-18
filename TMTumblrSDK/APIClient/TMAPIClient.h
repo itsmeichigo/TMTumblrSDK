@@ -8,7 +8,7 @@
 
 #import <JXHTTP/JXHTTP.h>
 
-typedef void (^TMAPICallback)(id, NSError *error);
+typedef void (^TMAPICallback)(id, CGFloat progress, NSError *error);
 
 /**
  Full wrapper around the [Tumblr API](http://www.tumblr.com/docs/en/api/). Please see API documentation for a listing 
